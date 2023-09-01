@@ -38,49 +38,19 @@ public abstract class KindofMisc extends EquipableItem {
 	@Override
 	public boolean doEquip(final Hero hero) {
 
-		boolean equipFull = false;
-		if ( this instanceof Artifact
-				&& hero.belongings.artifact != null
-				&& hero.belongings.misc != null){
-
-			//see if we can re-arrange items first
-			if (hero.belongings.misc instanceof Ring && hero.belongings.ring == null){
-				hero.belongings.ring = (Ring) hero.belongings.misc;
-				hero.belongings.misc = null;
-			} else {
-				equipFull = true;
-			}
-		} else if (this instanceof Ring
-				&& hero.belongings.misc != null
-				&& hero.belongings.ring != null){
-
-			//see if we can re-arrange items first
-			if (hero.belongings.misc instanceof Artifact && hero.belongings.artifact == null){
-				hero.belongings.artifact = (Artifact) hero.belongings.misc;
-				hero.belongings.misc = null;
-			} else {
-				equipFull = true;
-			}
-		}
-
-		if (equipFull) {
+		if (hero.belongings.misc1 != null 
+			&& hero.belongings.misc2 != null 
+			&& hero.belongings.misc3 != null) {
 
 			final KindofMisc[] miscs = new KindofMisc[3];
-			miscs[0] = hero.belongings.artifact;
-			miscs[1] = hero.belongings.misc;
-			miscs[2] = hero.belongings.ring;
+			miscs[0] = hero.belongings.misc1;
+			miscs[1] = hero.belongings.misc2;
+			miscs[2] = hero.belongings.misc3;
 
 			final boolean[] enabled = new boolean[3];
 			enabled[0] = miscs[0] != null;
 			enabled[1] = miscs[1] != null;
 			enabled[2] = miscs[2] != null;
-
-			//force swapping with the same type of item if 2x of that type is already present
-			if (this instanceof Ring && hero.belongings.misc instanceof Ring){
-				enabled[0] = false; //disable artifact
-			} else if (this instanceof Artifact && hero.belongings.misc instanceof Artifact){
-				enabled[2] = false; //disable ring
-			}
 
 			GameScene.show(
 					new WndOptions(new ItemSprite(this),
@@ -101,14 +71,6 @@ public abstract class KindofMisc extends EquipableItem {
 							slotOfUnequipped = -1;
 							Dungeon.hero.belongings.backpack.items.remove(KindofMisc.this);
 							if (equipped.doUnequip(hero, true, false)) {
-								//swap out equip in misc slot if needed
-								if (index == 0 && KindofMisc.this instanceof Ring){
-									hero.belongings.artifact = (Artifact)hero.belongings.misc;
-									hero.belongings.misc = null;
-								} else if (index == 2 && KindofMisc.this instanceof Artifact){
-									hero.belongings.ring = (Ring) hero.belongings.misc;
-									hero.belongings.misc = null;
-								}
 								Dungeon.hero.belongings.backpack.items.add(KindofMisc.this);
 								doEquip(hero);
 							} else {
@@ -133,11 +95,13 @@ public abstract class KindofMisc extends EquipableItem {
 		} else {
 
 			if (this instanceof Artifact){
-				if (hero.belongings.artifact == null)   hero.belongings.artifact = (Artifact) this;
-				else                                    hero.belongings.misc = (Artifact) this;
+				if (hero.belongings.misc1 == null)      hero.belongings.misc1 = (Artifact) this;
+				else if (hero.belongings.misc2 == null) hero.belongings.misc2 = (Artifact) this;
+				else                                    hero.belongings.misc3 = (Artifact) this;
 			} else if (this instanceof Ring){
-				if (hero.belongings.ring == null)   hero.belongings.ring = (Ring) this;
-				else                                hero.belongings.misc = (Ring) this;
+				if (hero.belongings.misc1 == null)      hero.belongings.misc1 = (Ring) this;
+				else if (hero.belongings.misc2 == null) hero.belongings.misc2 = (Ring) this;
+				else                                    hero.belongings.misc3 = (Ring) this;
 			}
 
 			detach( hero.belongings.backpack );
@@ -162,12 +126,12 @@ public abstract class KindofMisc extends EquipableItem {
 	public boolean doUnequip(Hero hero, boolean collect, boolean single) {
 		if (super.doUnequip(hero, collect, single)){
 
-			if (hero.belongings.artifact == this) {
-				hero.belongings.artifact = null;
-			} else if (hero.belongings.misc == this) {
-				hero.belongings.misc = null;
-			} else if (hero.belongings.ring == this){
-				hero.belongings.ring = null;
+			if (hero.belongings.misc1 == this) {
+				hero.belongings.misc1 = null;
+			} else if (hero.belongings.misc2 == this) {
+				hero.belongings.misc2 = null;
+			} else if (hero.belongings.misc3 == this){
+				hero.belongings.misc3 = null;
 			}
 
 			return true;
@@ -181,9 +145,9 @@ public abstract class KindofMisc extends EquipableItem {
 
 	@Override
 	public boolean isEquipped( Hero hero ) {
-		return hero != null && (hero.belongings.artifact() == this
-				|| hero.belongings.misc() == this
-				|| hero.belongings.ring() == this);
+		return hero != null && (hero.belongings.misc1() == this
+				|| hero.belongings.misc2() == this
+				|| hero.belongings.misc3() == this);
 	}
 
 }
