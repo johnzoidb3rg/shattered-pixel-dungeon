@@ -29,6 +29,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.bags.MagicalHolster;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.PotionBandolier;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.ScrollHolder;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.VelvetPouch;
+import com.shatteredpixel.shatteredpixeldungeon.items.bags.JewelryBox;
 import com.shatteredpixel.shatteredpixeldungeon.items.potions.Potion;
 import com.shatteredpixel.shatteredpixeldungeon.items.remains.RemainsItem;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
@@ -134,6 +135,7 @@ public class Badges {
 		PIRANHAS                    ( 64 ),
 		GRIM_WEAPON                 ( 65 ),
 		BAG_BOUGHT_VELVET_POUCH,
+		BAG_BOUGHT_JEWELRY_BOX,
 		BAG_BOUGHT_SCROLL_HOLDER,
 		BAG_BOUGHT_POTION_BANDOLIER,
 		BAG_BOUGHT_MAGICAL_HOLSTER,
@@ -583,6 +585,8 @@ public class Badges {
 		Badge badge = null;
 		if (bag instanceof VelvetPouch) {
 			badge = Badge.BAG_BOUGHT_VELVET_POUCH;
+		} else if (bag instanceof JewelryBox) {
+			badge = Badge.BAG_BOUGHT_JEWELRY_BOX;
 		} else if (bag instanceof ScrollHolder) {
 			badge = Badge.BAG_BOUGHT_SCROLL_HOLDER;
 		} else if (bag instanceof PotionBandolier) {
@@ -597,6 +601,7 @@ public class Badges {
 			
 			if (!local.contains( Badge.ALL_BAGS_BOUGHT ) &&
 				local.contains( Badge.BAG_BOUGHT_VELVET_POUCH ) &&
+				local.contains( Badge.BAG_BOUGHT_JEWELRY_BOX ) &&
 				local.contains( Badge.BAG_BOUGHT_SCROLL_HOLDER ) &&
 				local.contains( Badge.BAG_BOUGHT_POTION_BANDOLIER ) &&
 				local.contains( Badge.BAG_BOUGHT_MAGICAL_HOLSTER )) {

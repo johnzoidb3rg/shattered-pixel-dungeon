@@ -130,6 +130,7 @@ public class Dungeon {
 
 		//containers
 		VELVET_POUCH,
+		JEWELRY_BOX,
 		SCROLL_HOLDER,
 		POTION_BANDOLIER,
 		MAGICAL_HOLSTER,
