@@ -163,9 +163,9 @@ public class Belongings implements Iterable<Item> {
 	
 	private static final String WEAPON		= "weapon";
 	private static final String ARMOR		= "armor";
-	private static final String ARTIFACT   = "artifact";
-	private static final String MISC       = "misc";
-	private static final String RING       = "ring";
+	private static final String MISC1   	= "misc1";
+	private static final String MISC2       = "misc2";
+	private static final String MISC3       = "misc3";
 
 	private static final String SECOND_WEP = "second_wep";
 
@@ -175,9 +175,9 @@ public class Belongings implements Iterable<Item> {
 		
 		bundle.put( WEAPON, weapon );
 		bundle.put( ARMOR, armor );
-		bundle.put( MISC, misc1 );
-		bundle.put( MISC, misc2 );
-		bundle.put( MISC, misc3 );
+		bundle.put( MISC1, misc1 );
+		bundle.put( MISC2, misc2 );
+		bundle.put( MISC3, misc3 );
 		bundle.put( SECOND_WEP, secondWep );
 	}
 	
@@ -192,13 +192,13 @@ public class Belongings implements Iterable<Item> {
 		armor = (Armor)bundle.get( ARMOR );
 		if (armor() != null)        armor().activate( owner );
 
-		misc1 = (KindofMisc) bundle.get(MISC);
+		misc1 = (KindofMisc) bundle.get(MISC1);
 		if (misc1() != null)     misc1().activate(owner);
 
-		misc2 = (KindofMisc) bundle.get(MISC);
+		misc2 = (KindofMisc) bundle.get(MISC2);
 		if (misc2() != null)         misc2().activate( owner );
 
-		misc3 = (KindofMisc) bundle.get(MISC);
+		misc3 = (KindofMisc) bundle.get(MISC3);
 		if (misc3() != null)         misc3().activate( owner );
 
 		secondWep = (KindOfWeapon) bundle.get(SECOND_WEP);
