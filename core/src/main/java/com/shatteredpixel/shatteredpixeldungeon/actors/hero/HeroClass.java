@@ -104,9 +104,6 @@ public enum HeroClass {
 		new VelvetPouch().collect();
 		Dungeon.LimitedDrops.VELVET_POUCH.drop();
 
-		new JewelryBox().collect();
-		Dungeon.LimitedDrops.JEWELRY_BOX.drop();
-
 		Waterskin waterskin = new Waterskin();
 		waterskin.collect();
 
