@@ -79,9 +79,9 @@ public class InventorySlot extends ItemSlot {
 			boolean equipped = item.isEquipped(Dungeon.hero) ||
 					item == Dungeon.hero.belongings.weapon ||
 					item == Dungeon.hero.belongings.armor ||
-					item == Dungeon.hero.belongings.artifact ||
-					item == Dungeon.hero.belongings.misc ||
-					item == Dungeon.hero.belongings.ring ||
+					item == Dungeon.hero.belongings.artifact1 ||
+					item == Dungeon.hero.belongings.artifact2 ||
+					item == Dungeon.hero.belongings.artifact3 ||
 					item == Dungeon.hero.belongings.secondWep;
 
 			bg.texture( TextureCache.createSolid( equipped ? EQUIPPED : NORMAL ) );
