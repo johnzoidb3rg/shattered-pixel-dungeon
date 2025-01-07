@@ -32,7 +32,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.ItemStatusHandler;
-import com.shatteredpixel.shatteredpixeldungeon.items.KindofMisc;
+import com.shatteredpixel.shatteredpixeldungeon.items.EquipableItem;
 import com.shatteredpixel.shatteredpixeldungeon.items.trinkets.ShardOfOblivion;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Catalog;
 import com.shatteredpixel.shatteredpixeldungeon.journal.Notes;
@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 
-public class Ring extends KindofMisc {
+public class Ring extends EquipableItem {
 	
 	protected Buff buff;
 
@@ -70,6 +70,7 @@ public class Ring extends KindofMisc {
 	private static ItemStatusHandler<Ring> handler;
 	
 	private String gem;
+	private boolean equipped;
 	
 	//rings cannot be 'used' like other equipment, so they ID purely based on exp
 	private float levelsToID = 1;
@@ -120,8 +121,29 @@ public class Ring extends KindofMisc {
 			image = ItemSpriteSheet.RING_GARNET;
 			gem = "garnet";
 		}
+		equipped = false;
 	}
 	
+	@Override
+	public boolean doEquip( final Hero hero ) {
+
+		Talent.onItemEquipped(hero, this);
+		activate( hero );
+
+		cursedKnown = true;
+		if (cursed) {
+			equipCursed( hero );
+			GLog.n( Messages.get(this, "equip_cursed", this) );
+		}
+
+		hero.spendAndNext( timeToEquip(hero) );
+		
+		equipped = true;
+
+		return true;
+
+	}
+
 	public void activate( Char ch ) {
 		if (buff != null){
 			buff.detach();
@@ -140,6 +162,8 @@ public class Ring extends KindofMisc {
 				buff = null;
 			}
 
+			equipped = false;
+
 			return true;
 
 		} else {
@@ -147,6 +171,11 @@ public class Ring extends KindofMisc {
 			return false;
 
 		}
+	}
+
+	@Override
+	public boolean isEquipped( Hero hero ) {
+		return equipped;
 	}
 	
 	public boolean isKnown() {
@@ -395,11 +424,10 @@ public class Ring extends KindofMisc {
 	//just used for ring descriptions
 	public int combinedBonus(Hero hero){
 		int bonus = 0;
-		if (hero.belongings.ring() != null && hero.belongings.ring().getClass() == getClass()){
-			bonus += hero.belongings.ring().soloBonus();
-		}
-		if (hero.belongings.misc() != null && hero.belongings.misc().getClass() == getClass()){
-			bonus += ((Ring)hero.belongings.misc()).soloBonus();
+		for (Item item : hero.belongings){
+			if (item instanceof Ring && ((Ring)item).isEquipped(hero) && ((Ring)item).getClass() == getClass()){
+				bonus += ((Ring)item).soloBonus();
+			}
 		}
 		return bonus;
 	}
@@ -407,11 +435,10 @@ public class Ring extends KindofMisc {
 	//just used for ring descriptions
 	public int combinedBuffedBonus(Hero hero){
 		int bonus = 0;
-		if (hero.belongings.ring() != null && hero.belongings.ring().getClass() == getClass()){
-			bonus += hero.belongings.ring().soloBuffedBonus();
-		}
-		if (hero.belongings.misc() != null && hero.belongings.misc().getClass() == getClass()){
-			bonus += ((Ring)hero.belongings.misc()).soloBuffedBonus();
+		for (Item item : hero.belongings){
+			if (item instanceof Ring && ((Ring)item).isEquipped(hero) && ((Ring)item).getClass() == getClass()){
+				bonus += ((Ring)item).soloBuffedBonus();
+			}
 		}
 		return bonus;
 	}

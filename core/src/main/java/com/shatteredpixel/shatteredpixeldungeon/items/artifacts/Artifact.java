@@ -26,14 +26,18 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.MagicImmune;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.KindofMisc;
+import com.shatteredpixel.shatteredpixeldungeon.items.EquipableItem;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
+import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.shatteredpixeldungeon.sprites.ItemSprite;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
+import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.Random;
 
-public class Artifact extends KindofMisc {
+public class Artifact extends EquipableItem {
 
 	protected Buff passiveBuff;
 	protected Buff activeBuff;
@@ -59,25 +63,93 @@ public class Artifact extends KindofMisc {
 	@Override
 	public boolean doEquip( final Hero hero ) {
 
-		if ((hero.belongings.artifact != null && hero.belongings.artifact.getClass() == this.getClass())
-				|| (hero.belongings.misc != null && hero.belongings.misc.getClass() == this.getClass())){
+		if ((hero.belongings.artifact1 != null && hero.belongings.artifact1.getClass() == this.getClass())
+				|| (hero.belongings.artifact2 != null && hero.belongings.artifact2.getClass() == this.getClass())
+				|| (hero.belongings.artifact3 != null && hero.belongings.artifact3.getClass() == this.getClass())){
 
 			GLog.w( Messages.get(Artifact.class, "cannot_wear_two") );
 			return false;
 
 		} else {
 
-			if (super.doEquip( hero )){
+			if (hero.belongings.artifact1 != null 
+				&& hero.belongings.artifact2 != null 
+				&& hero.belongings.artifact3 != null) {
 
-				identify();
-				return true;
+				final Artifact[] miscs = new Artifact[3];
+				miscs[0] = hero.belongings.artifact1;
+				miscs[1] = hero.belongings.artifact2;
+				miscs[2] = hero.belongings.artifact3;
 
-			} else {
+				final boolean[] enabled = new boolean[3];
+				enabled[0] = miscs[0] != null;
+				enabled[1] = miscs[1] != null;
+				enabled[2] = miscs[2] != null;
+
+				GameScene.show(
+						new WndOptions(new ItemSprite(this),
+								Messages.get(Artifact.class, "unequip_title"),
+								Messages.get(Artifact.class, "unequip_message"),
+								miscs[0] == null ? "---" : Messages.titleCase(miscs[0].title()),
+								miscs[1] == null ? "---" : Messages.titleCase(miscs[1].title()),
+								miscs[2] == null ? "---" : Messages.titleCase(miscs[2].title())) {
+
+							@Override
+							protected void onSelect(int index) {
+
+								Artifact equipped = miscs[index];
+								//we directly remove the item because we want to have inventory capacity
+								// to unequip the equipped one, but don't want to trigger any other
+								// item detaching logic
+								int slot = Dungeon.quickslot.getSlot(Artifact.this);
+								slotOfUnequipped = -1;
+								Dungeon.hero.belongings.backpack.items.remove(Artifact.this);
+								if (equipped.doUnequip(hero, true, false)) {
+									Dungeon.hero.belongings.backpack.items.add(Artifact.this);
+									doEquip(hero);
+								} else {
+									Dungeon.hero.belongings.backpack.items.add(Artifact.this);
+								}
+								if (slot != -1) {
+									Dungeon.quickslot.setSlot(slot, Artifact.this);
+								} else if (slotOfUnequipped != -1 && defaultAction() != null){
+									Dungeon.quickslot.setSlot(slotOfUnequipped, Artifact.this);
+								}
+								updateQuickslot();
+							}
+
+							@Override
+							protected boolean enabled(int index) {
+								return enabled[index];
+							}
+						});
 
 				return false;
 
-			}
+			} else {
 
+				if (hero.belongings.artifact1 == null)      hero.belongings.artifact1 = (Artifact) this;
+				else if (hero.belongings.artifact2 == null) hero.belongings.artifact2 = (Artifact) this;
+				else                                        hero.belongings.artifact3 = (Artifact) this;
+
+				detach( hero.belongings.backpack );
+
+				Talent.onItemEquipped(hero, this);
+				activate( hero );
+
+				cursedKnown = true;
+				if (cursed) {
+					equipCursed( hero );
+					GLog.n( Messages.get(this, "equip_cursed", this) );
+				}
+
+				hero.spendAndNext( timeToEquip(hero) );
+
+				identify();
+
+				return true;
+
+			}
 		}
 
 	}
@@ -95,6 +167,14 @@ public class Artifact extends KindofMisc {
 	public boolean doUnequip( Hero hero, boolean collect, boolean single ) {
 		if (super.doUnequip( hero, collect, single )) {
 
+			if (hero.belongings.artifact1 == this) {
+				hero.belongings.artifact1 = null;
+			} else if (hero.belongings.artifact2 == this) {
+				hero.belongings.artifact2 = null;
+			} else if (hero.belongings.artifact3 == this){
+				hero.belongings.artifact3 = null;
+			}
+
 			if (passiveBuff != null) {
 				if (passiveBuff.target != null) passiveBuff.detach();
 				passiveBuff = null;
@@ -107,6 +187,13 @@ public class Artifact extends KindofMisc {
 			return false;
 
 		}
+	}
+
+	@Override
+	public boolean isEquipped( Hero hero ) {
+		return hero != null && (hero.belongings.artifact1() == this
+				|| hero.belongings.artifact2() == this
+				|| hero.belongings.artifact3() == this);
 	}
 
 	@Override
